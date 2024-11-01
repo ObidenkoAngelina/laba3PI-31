@@ -1,13 +1,25 @@
 ﻿#include <iostream>
 #include <cstdio>
+#include <cstdlib>
+#include <ctime> 
 
 #define SIZE 9
 
 class Grid {
 private:
     char cells[SIZE][SIZE];
+    bool visible[SIZE][SIZE];
 
 public:
+
+    Grid() {
+        // Инициализация массива visible
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                visible[row][col] = true; // Сначала все ячейки видимые
+            }
+        }
+    }
 
     void initializeGrid() {
         for (int row = 0; row < SIZE; row++) {
@@ -27,8 +39,19 @@ public:
                     startValue = (row < 3) ? (row * 3 + 1) : (2 + (row - 3) * 3);
                 }
                 // Используем формулу для заполнения ячеек
-                int value = (startValue + col - 1) % 9 + 1; // Модуль 9 и плюс 1 для диапазона от 1 до 9
+                int value = (startValue + col - 1) % 9 + 1;
                 cells[row][col] = '0' + value; // Преобразуем в символ
+            }
+        }
+    }
+
+    void hideNumbers(int row) {
+        int hiddenCount = 0;
+        while (hiddenCount < 4) { // Скрываем 4 числа
+            int col = rand() % SIZE; // Генерируем случайный индекс колонки
+            if (visible[row][col]) { // Проверяем, чтобы не скрыть уже скрытое
+                visible[row][col] = false; // Скрыть это число
+                hiddenCount++;
             }
         }
     }
@@ -37,7 +60,12 @@ public:
         std::cout << "+---+---+---+---+---+---+---+---+---+\n";
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
-                std::cout << "| " << cells[row][col] << " ";
+                if (visible[row][col]) {
+                    std::cout << "| " << cells[row][col] << " "; // Печать видимых значений
+                }
+                else {
+                    std::cout << "|   "; // Печать скрытых значений
+                }
             }
             std::cout << "|\n";
             std::cout << "+---+---+---+---+---+---+---+---+---+\n";
@@ -46,9 +74,13 @@ public:
 };
 
 int main() {
+    srand(static_cast<unsigned int>(time(0))); // Инициализация генератора случайных чисел
     Grid* dynamicGrid = new Grid(); // Создание одного динамического объекта Grid
     dynamicGrid->initializeGrid(); // Инициализация сетки
-    dynamicGrid->printGrid(); // Печать сетки
+    for (int row = 0; row < SIZE; row++) {
+        dynamicGrid->hideNumbers(row);
+    }
+    dynamicGrid->printGrid();
     delete dynamicGrid; // Освобождение памяти, занятой объектом Grid
     return 0;
 }
