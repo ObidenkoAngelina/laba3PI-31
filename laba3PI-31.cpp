@@ -5,6 +5,7 @@
 #include <ctime> 
 
 #define SIZE 9
+#define TIME_LIMIT 300
 
 class Grid {
 private:
@@ -115,19 +116,46 @@ public:
             std::cout << "Неправильное число!\n";
         }
     }
+
+    bool allCellsVisible() {
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (!visible[row][col]) {
+                    return false; // Если найдена закрытая ячейка
+                }
+            }
+        }
+        return true; // Все ячейки открыты
+    }
+
+    static bool isTimeUp(time_t startTime) {
+        return difftime(time(NULL), startTime) >= TIME_LIMIT; // Возвращает true, если время истекло
+    }
+
 };
 
 int main() {
     setlocale(LC_ALL, "Rus");
     srand(static_cast<unsigned int>(time(0))); // Инициализация генератора случайных чисел
+    time_t startTime = time(NULL);
     Grid* dynamicGrid = new Grid(); // Создание одного динамического объекта Grid
     dynamicGrid->initializeGrid(); // Инициализация сетки
     for (int row = 0; row < SIZE; row++) {
         dynamicGrid->hideNumbers(row);
     }
     dynamicGrid->printGrid();
-    dynamicGrid->insertNumber();
-    dynamicGrid->printGrid();
+    while (!dynamicGrid->allCellsVisible() && !Grid::isTimeUp(startTime)) { // Проверка состояния ячеек и времени
+        dynamicGrid->insertNumber(); // Ввод числа пользователем
+        dynamicGrid->printGrid(); // Печать обновленной сетки
+    }
+
+    if (Grid::isTimeUp(startTime)) { // Проверка на истечение времени после выхода из цикла
+        std::cout << "Ваше время вышло! Игра окончена!\n";
+    }
+    else {
+        std::cout << "Все ячейки открыты!\n"; // Сообщение о победе
+    }
+
     delete dynamicGrid; // Освобождение памяти, занятой объектом Grid
     return 0;
 }
