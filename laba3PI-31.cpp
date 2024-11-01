@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime> 
@@ -71,15 +72,61 @@ public:
             std::cout << "+---+---+---+---+---+---+---+---+---+\n";
         }
     }
+
+    void insertNumber() {
+        int row, col, number;
+
+        // Запрос ввода номера строки
+        std::cout << "Введите номер строки (0-8): ";
+        std::cin >> row;
+
+        // Запрос ввода номера колонки
+        std::cout << "Введите номер колонки (0-8): ";
+        std::cin >> col;
+
+        // Проверка корректности введенных индексов
+        if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
+            std::cout << "Некорректный выбор ячейки.\n";
+            return;
+        }
+
+        // Проверка, открыта ли ячейка
+        if (visible[row][col]) {
+            std::cout << "Эта ячейка уже открыта.\n";
+            return;
+        }
+
+        // Запрос ввода числа
+        std::cout << "Введите число (1-9): ";
+        std::cin >> number;
+
+        // Проверка на корректность введенного числа
+        if (number < 1 || number > 9) {
+            std::cout << "Неверное число. Пожалуйста, введите число от 1 до 9.\n";
+            return;
+        }
+
+        // Сравнение введенного числа с фактическим значением ячейки
+        if (cells[row][col] == '0' + number) {
+            visible[row][col] = true; // Открываем ячейку
+            std::cout << "Правильное число! Ячейка открыта.\n";
+        }
+        else {
+            std::cout << "Неправильное число!\n";
+        }
+    }
 };
 
 int main() {
+    setlocale(LC_ALL, "Rus");
     srand(static_cast<unsigned int>(time(0))); // Инициализация генератора случайных чисел
     Grid* dynamicGrid = new Grid(); // Создание одного динамического объекта Grid
     dynamicGrid->initializeGrid(); // Инициализация сетки
     for (int row = 0; row < SIZE; row++) {
         dynamicGrid->hideNumbers(row);
     }
+    dynamicGrid->printGrid();
+    dynamicGrid->insertNumber();
     dynamicGrid->printGrid();
     delete dynamicGrid; // Освобождение памяти, занятой объектом Grid
     return 0;
