@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime> 
+#include <string>
 
 #define SIZE 9
 #define TIME_LIMIT 300
@@ -134,27 +135,49 @@ public:
 
 };
 
+class Player {
+private:
+    Grid* grid; // Ссылка на объект Grid
+    std::string name;
+
+public:
+    Player(Grid* grid, const std::string& name) : grid(grid), name(name) {}
+
+    void play(time_t startTime) {
+        std::cout << "Игрок " << name << " начинает игру...\n";
+        while (!grid->allCellsVisible() && !Grid::isTimeUp(startTime)) {
+            grid->insertNumber(); // Ввод числа пользователем
+            grid->printGrid(); // Печать обновленной сетки
+        }
+
+        if (Grid::isTimeUp(startTime)) { // Проверка на истечение времени
+            std::cout << "Ваше время вышло! Игрок " << name << " проиграл!\n";
+        }
+        else {
+            std::cout << "Все ячейки открыты! Игрок " << name << " победил!\n"; // Сообщение о победе
+        }
+    }
+};
+
 int main() {
     setlocale(LC_ALL, "Rus");
     srand(static_cast<unsigned int>(time(0))); // Инициализация генератора случайных чисел
     time_t startTime = time(NULL);
+
     Grid* dynamicGrid = new Grid(); // Создание одного динамического объекта Grid
     dynamicGrid->initializeGrid(); // Инициализация сетки
     for (int row = 0; row < SIZE; row++) {
         dynamicGrid->hideNumbers(row);
     }
     dynamicGrid->printGrid();
-    while (!dynamicGrid->allCellsVisible() && !Grid::isTimeUp(startTime)) { // Проверка состояния ячеек и времени
-        dynamicGrid->insertNumber(); // Ввод числа пользователем
-        dynamicGrid->printGrid(); // Печать обновленной сетки
-    }
 
-    if (Grid::isTimeUp(startTime)) { // Проверка на истечение времени после выхода из цикла
-        std::cout << "Ваше время вышло! Игра окончена!\n";
-    }
-    else {
-        std::cout << "Все ячейки открыты!\n"; // Сообщение о победе
-    }
+    std::string playerName;
+    std::cout << "Введите имя игрока: ";
+    std::getline(std::cin, playerName);
+
+    // Создаем игрока и начинаем игру
+    Player player(dynamicGrid, playerName);
+    player.play(startTime);
 
     delete dynamicGrid; // Освобождение памяти, занятой объектом Grid
     return 0;
