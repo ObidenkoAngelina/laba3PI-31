@@ -12,6 +12,7 @@ class Grid {
 private:
     char cells[SIZE][SIZE];
     bool visible[SIZE][SIZE];
+    static int gridCount;
 
 public:
 
@@ -22,6 +23,17 @@ public:
                 this->visible[row][col] = true; // Сначала все ячейки видимые
             }
         }
+        gridCount++; // Увеличиваем счетчик при создании нового объекта
+    }
+
+    // Деструктор
+    ~Grid() {
+        gridCount--; // Уменьшаем счетчик при уничтожении объекта
+    }
+
+    // Статический метод для получения количества объектов Grid
+    static int getGridCount() {
+        return gridCount;
     }
 
     // Конструктор копирования
@@ -32,6 +44,7 @@ public:
                 this->visible[row][col] = other.visible[row][col];
             }
         }
+        gridCount++;
     }
 
     // Перегрузка оператора присваивания
@@ -85,20 +98,17 @@ public:
     bool insertNumber(int row, int col, int number) {
         // Проверка корректности введенных индексов
         if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
-            std::cout << "Некорректный выбор ячейки.\n";
-            return false;
+            throw std::out_of_range("Некорректный выбор ячейки."); // Выбрасываем исключение
         }
 
         // Проверка, открыта ли ячейка
         if (visible[row][col]) {
-            std::cout << "Эта ячейка уже открыта.\n";
-            return false;
+            throw std::logic_error("Эта ячейка уже открыта."); // Выбрасываем исключение
         }
 
         // Проверка на корректность введенного числа
         if (number < 1 || number > 9) {
-            std::cout << "Неверное число. Пожалуйста, введите число от 1 до 9.\n";
-            return false;
+            throw std::invalid_argument("Неверное число. Пожалуйста, введите число от 1 до 9."); // Выбрасываем исключение
         }
 
         // Сравнение введенного числа с фактическим значением ячейки
@@ -152,6 +162,9 @@ public:
 
 };
 
+// Инициализация статического поля
+int Grid::gridCount = 0;
+
 class Player {
 private:
     Grid* grid; // Ссылка на объект Grid
@@ -164,24 +177,25 @@ public:
         std::cout << "Игрок " << this->name << " начинает игру...\n";
         while (!this->grid->allCellsVisible() && !Grid::isTimeUp(startTime)) {
             int row, col, number;
+            try {
+                std::cout << "Введите номер строки (0-8): ";
+                std::cin >> row;
 
-            // Запрос ввода номера строки
-            std::cout << "Введите номер строки (0-8): ";
-            std::cin >> row;
+                std::cout << "Введите номер колонки (0-8): ";
+                std::cin >> col;
 
-            // Запрос ввода номера колонки
-            std::cout << "Введите номер колонки (0-8): ";
-            std::cin >> col;
+                std::cout << "Введите число (1-9): ";
+                std::cin >> number;
 
-            // Запрос ввода числа
-            std::cout << "Введите число (1-9): ";
-            std::cin >> number;
+                bool result = this->grid->insertNumber(row, col, number);
+                std::cout << *this->grid;
 
-            bool result = this->grid->insertNumber(row, col, number); // Получаем результат
-            std::cout << *this->grid; // Используем перегруженный оператор для отображения сетки
-
-            if (!result) {
-                std::cout << "Попробуйте снова.\n";
+                if (!result) {
+                    std::cout << "Попробуйте снова.\n";
+                }
+            }
+            catch (const std::exception& e) { // Перехватываем исключения
+                std::cout << "Ошибка: " << e.what() << "\n"; // Выводим сообщение об ошибке
             }
         }
 
@@ -215,6 +229,8 @@ int main() {
     // Создаем игрока и начинаем игру
     Player player(dynamicGrid, playerName);
     player.play(startTime);
+
+    std::cout << "Всего создано объектов Grid: " << Grid::getGridCount() << std::endl;
 
     delete dynamicGrid; // Освобождение памяти, занятой объектом Grid
     return 0;
