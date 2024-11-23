@@ -59,22 +59,6 @@ public:
         }
     }
 
-    void printGrid() {
-        std::cout << "+---+---+---+---+---+---+---+---+---+\n";
-        for (int row = 0; row < SIZE; row++) {
-            for (int col = 0; col < SIZE; col++) {
-                if (visible[row][col]) {
-                    std::cout << "| " << cells[row][col] << " "; // Печать видимых значений
-                }
-                else {
-                    std::cout << "|   "; // Печать скрытых значений
-                }
-            }
-            std::cout << "|\n";
-            std::cout << "+---+---+---+---+---+---+---+---+---+\n";
-        }
-    }
-
     bool insertNumber(int row, int col, int number) {
         // Проверка корректности введенных индексов
         if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
@@ -125,6 +109,8 @@ public:
         return difftime(time(NULL), startTime) >= TIME_LIMIT; // Возвращает true, если время истекло
     }
 
+    friend void displayGrid(const Grid& grid); // Дружественная функция для вывода сетки
+
 };
 
 class Player {
@@ -153,7 +139,7 @@ public:
             std::cin >> number;
 
             bool result = grid->insertNumber(row, col, number); // Получаем результат
-            grid->printGrid(); // Печать обновленной сетки
+            displayGrid(*grid); // Дружественная функция для отображения сетки
 
             if (!result) {
                 std::cout << "Попробуйте снова.\n";
@@ -169,6 +155,22 @@ public:
     }
 };
 
+void displayGrid(const Grid& grid) {
+    std::cout << "+---+---+---+---+---+---+---+---+---+\n";
+    for (int row = 0; row < SIZE; row++) {
+        for (int col = 0; col < SIZE; col++) {
+            if (grid.visible[row][col]) {
+                std::cout << "| " << grid.cells[row][col] << " "; // Печать видимых значений
+            }
+            else {
+                std::cout << "|   "; // Печать скрытых значений
+            }
+        }
+        std::cout << "|\n";
+        std::cout << "+---+---+---+---+---+---+---+---+---+\n";
+    }
+}
+
 int main() {
     setlocale(LC_ALL, "Rus");
     srand(static_cast<unsigned int>(time(0))); // Инициализация генератора случайных чисел
@@ -179,7 +181,9 @@ int main() {
     for (int row = 0; row < SIZE; row++) {
         dynamicGrid->hideNumbers(row);
     }
-    dynamicGrid->printGrid();
+
+    // Начальное состояние сетки
+    displayGrid(*dynamicGrid);
 
     std::string playerName;
     std::cout << "Введите имя игрока: ";
