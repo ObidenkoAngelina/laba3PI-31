@@ -109,7 +109,23 @@ public:
         return difftime(time(NULL), startTime) >= TIME_LIMIT; // Возвращает true, если время истекло
     }
 
-    friend void displayGrid(const Grid& grid); // Дружественная функция для вывода сетки
+    // Перегрузка оператора вывода
+    friend std::ostream& operator<<(std::ostream& os, const Grid& grid) {
+        os << "+---+---+---+---+---+---+---+---+---+\n";
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (grid.visible[row][col]) {
+                    os << "| " << grid.cells[row][col] << " "; // Печать видимых значений
+                }
+                else {
+                    os << "|   "; // Печать скрытых значений
+                }
+            }
+            os << "|\n";
+            os << "+---+---+---+---+---+---+---+---+---+\n";
+        }
+        return os;
+    }
 
 };
 
@@ -139,7 +155,7 @@ public:
             std::cin >> number;
 
             bool result = grid->insertNumber(row, col, number); // Получаем результат
-            displayGrid(*grid); // Дружественная функция для отображения сетки
+            std::cout << *grid; // Используем перегруженный оператор для отображения сетки
 
             if (!result) {
                 std::cout << "Попробуйте снова.\n";
@@ -155,22 +171,6 @@ public:
     }
 };
 
-void displayGrid(const Grid& grid) {
-    std::cout << "+---+---+---+---+---+---+---+---+---+\n";
-    for (int row = 0; row < SIZE; row++) {
-        for (int col = 0; col < SIZE; col++) {
-            if (grid.visible[row][col]) {
-                std::cout << "| " << grid.cells[row][col] << " "; // Печать видимых значений
-            }
-            else {
-                std::cout << "|   "; // Печать скрытых значений
-            }
-        }
-        std::cout << "|\n";
-        std::cout << "+---+---+---+---+---+---+---+---+---+\n";
-    }
-}
-
 int main() {
     setlocale(LC_ALL, "Rus");
     srand(static_cast<unsigned int>(time(0))); // Инициализация генератора случайных чисел
@@ -183,7 +183,7 @@ int main() {
     }
 
     // Начальное состояние сетки
-    displayGrid(*dynamicGrid);
+    std::cout << *dynamicGrid; // Вызов перегруженного оператора для отображения сетки
 
     std::string playerName;
     std::cout << "Введите имя игрока: ";
