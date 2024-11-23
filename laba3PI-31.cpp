@@ -50,7 +50,7 @@ public:
 
     void hideNumbers(int row) {
         int hiddenCount = 0;
-        while (hiddenCount < 4) { // Скрываем 4 числа
+        while (hiddenCount < 1) { // Скрываем 4 числа
             int col = rand() % SIZE; // Генерируем случайный индекс колонки
             if (visible[row][col]) { // Проверяем, чтобы не скрыть уже скрытое
                 visible[row][col] = false; // Скрыть это число
@@ -75,47 +75,39 @@ public:
         }
     }
 
-    void insertNumber() {
-        int row, col, number;
-
-        // Запрос ввода номера строки
-        std::cout << "Введите номер строки (0-8): ";
-        std::cin >> row;
-
-        // Запрос ввода номера колонки
-        std::cout << "Введите номер колонки (0-8): ";
-        std::cin >> col;
-
+    bool insertNumber(int row, int col, int number) {
         // Проверка корректности введенных индексов
         if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
             std::cout << "Некорректный выбор ячейки.\n";
-            return;
+            return false;
         }
 
         // Проверка, открыта ли ячейка
         if (visible[row][col]) {
             std::cout << "Эта ячейка уже открыта.\n";
-            return;
+            return false;
         }
-
-        // Запрос ввода числа
-        std::cout << "Введите число (1-9): ";
-        std::cin >> number;
 
         // Проверка на корректность введенного числа
         if (number < 1 || number > 9) {
             std::cout << "Неверное число. Пожалуйста, введите число от 1 до 9.\n";
-            return;
+            return false;
         }
 
         // Сравнение введенного числа с фактическим значением ячейки
         if (cells[row][col] == '0' + number) {
             visible[row][col] = true; // Открываем ячейку
             std::cout << "Правильное число! Ячейка открыта.\n";
+            return true;
         }
         else {
             std::cout << "Неправильное число!\n";
+            return false;
         }
+    }
+
+    void insertNumber(int row, int col, int number, bool* result) {
+        *result = insertNumber(row, col, number);
     }
 
     bool allCellsVisible() {
@@ -146,8 +138,26 @@ public:
     void play(time_t startTime) {
         std::cout << "Игрок " << name << " начинает игру...\n";
         while (!grid->allCellsVisible() && !Grid::isTimeUp(startTime)) {
-            grid->insertNumber(); // Ввод числа пользователем
+            int row, col, number;
+
+            // Запрос ввода номера строки
+            std::cout << "Введите номер строки (0-8): ";
+            std::cin >> row;
+
+            // Запрос ввода номера колонки
+            std::cout << "Введите номер колонки (0-8): ";
+            std::cin >> col;
+
+            // Запрос ввода числа
+            std::cout << "Введите число (1-9): ";
+            std::cin >> number;
+
+            bool result = grid->insertNumber(row, col, number); // Получаем результат
             grid->printGrid(); // Печать обновленной сетки
+
+            if (!result) {
+                std::cout << "Попробуйте снова.\n";
+            }
         }
 
         if (Grid::isTimeUp(startTime)) { // Проверка на истечение времени
