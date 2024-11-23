@@ -234,4 +234,5 @@ int main() {
 
     delete dynamicGrid; // Освобождение памяти, занятой объектом Grid
     return 0;
+
 }
