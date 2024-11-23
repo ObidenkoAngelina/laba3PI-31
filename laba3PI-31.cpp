@@ -24,6 +24,29 @@ public:
         }
     }
 
+    // Конструктор копирования
+    Grid(const Grid& other) {
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                cells[row][col] = other.cells[row][col];
+                visible[row][col] = other.visible[row][col];
+            }
+        }
+    }
+
+    // Перегрузка оператора присваивания
+    Grid& operator=(const Grid& other) {
+        if (this != &other) { // Проверка на самоприсваивание
+            for (int row = 0; row < SIZE; row++) {
+                for (int col = 0; col < SIZE; col++) {
+                    cells[row][col] = other.cells[row][col];
+                    visible[row][col] = other.visible[row][col];
+                }
+            }
+        }
+        return *this;
+    }
+
     void initializeGrid() {
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
