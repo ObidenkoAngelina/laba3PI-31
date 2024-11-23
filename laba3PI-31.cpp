@@ -19,7 +19,7 @@ public:
         // Инициализация массива visible
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
-                visible[row][col] = true; // Сначала все ячейки видимые
+                this->visible[row][col] = true; // Сначала все ячейки видимые
             }
         }
     }
@@ -28,8 +28,8 @@ public:
     Grid(const Grid& other) {
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
-                cells[row][col] = other.cells[row][col];
-                visible[row][col] = other.visible[row][col];
+                this->cells[row][col] = other.cells[row][col];
+                this->visible[row][col] = other.visible[row][col];
             }
         }
     }
@@ -39,8 +39,8 @@ public:
         if (this != &other) { // Проверка на самоприсваивание
             for (int row = 0; row < SIZE; row++) {
                 for (int col = 0; col < SIZE; col++) {
-                    cells[row][col] = other.cells[row][col];
-                    visible[row][col] = other.visible[row][col];
+                    this->cells[row][col] = other.cells[row][col];
+                    this->visible[row][col] = other.visible[row][col];
                 }
             }
         }
@@ -66,7 +66,7 @@ public:
                 }
                 // Используем формулу для заполнения ячеек
                 int value = (startValue + col - 1) % 9 + 1;
-                cells[row][col] = '0' + value; // Преобразуем в символ
+                this->cells[row][col] = '0' + value; // Преобразуем в символ
             }
         }
     }
@@ -75,8 +75,8 @@ public:
         int hiddenCount = 0;
         while (hiddenCount < 1) { // Скрываем 4 числа
             int col = rand() % SIZE; // Генерируем случайный индекс колонки
-            if (visible[row][col]) { // Проверяем, чтобы не скрыть уже скрытое
-                visible[row][col] = false; // Скрыть это число
+            if (this->visible[row][col]) { // Проверяем, чтобы не скрыть уже скрытое
+                this->visible[row][col] = false; // Скрыть это число
                 hiddenCount++;
             }
         }
@@ -120,7 +120,7 @@ public:
     bool allCellsVisible() {
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
-                if (!visible[row][col]) {
+                if (!this->visible[row][col]) {
                     return false; // Если найдена закрытая ячейка
                 }
             }
@@ -161,8 +161,8 @@ public:
     Player(Grid* grid, const std::string& name) : grid(grid), name(name) {}
 
     void play(time_t startTime) {
-        std::cout << "Игрок " << name << " начинает игру...\n";
-        while (!grid->allCellsVisible() && !Grid::isTimeUp(startTime)) {
+        std::cout << "Игрок " << this->name << " начинает игру...\n";
+        while (!this->grid->allCellsVisible() && !Grid::isTimeUp(startTime)) {
             int row, col, number;
 
             // Запрос ввода номера строки
@@ -177,8 +177,8 @@ public:
             std::cout << "Введите число (1-9): ";
             std::cin >> number;
 
-            bool result = grid->insertNumber(row, col, number); // Получаем результат
-            std::cout << *grid; // Используем перегруженный оператор для отображения сетки
+            bool result = this->grid->insertNumber(row, col, number); // Получаем результат
+            std::cout << *this->grid; // Используем перегруженный оператор для отображения сетки
 
             if (!result) {
                 std::cout << "Попробуйте снова.\n";
