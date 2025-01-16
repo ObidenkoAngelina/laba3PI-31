@@ -9,7 +9,7 @@
 #define TIME_LIMIT 300
 
 class Grid {
-protected: 
+protected:
     char cells[SIZE][SIZE];
     bool visible[SIZE][SIZE];
     static int gridCount;
@@ -60,7 +60,7 @@ public:
         return *this;
     }
 
-    void initializeGrid() {
+    virtual void initializeGrid() {
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 // Определяем начальное значение для каждой строки
@@ -164,6 +164,28 @@ public:
 
 // Инициализация статического поля
 int Grid::gridCount = 0;
+
+class CustomGrid : public Grid {
+public:
+    // Перегрузка метода initializeGrid без вызова базового метода
+    void initializeGrid() override {
+        std::cout << "Инициализация пользовательской сетки." << std::endl;
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                // Заполнение сетки случайными числами от 1 до 9
+                this->cells[row][col] = '0' + (rand() % 9 + 1);
+                this->visible[row][col] = true; // Все ячейки видимы
+            }
+        }
+    }
+
+    // Перегрузка метода initializeGrid с вызовом базового метода
+    void initializeGridWithBase() {
+        Grid::initializeGrid(); // Вызов метода базового класса
+        std::cout << "Дополнительная инициализация пользовательской сетки." << std::endl;
+        // Дополнительная логика инициализации может быть добавлена здесь
+    }
+};
 
 class Player {
 private:
