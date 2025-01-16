@@ -9,7 +9,7 @@
 #define TIME_LIMIT 300
 
 class Grid {
-protected:
+protected: 
     char cells[SIZE][SIZE];
     bool visible[SIZE][SIZE];
     static int gridCount;
