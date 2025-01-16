@@ -167,6 +167,15 @@ int Grid::gridCount = 0;
 
 class CustomGrid : public Grid {
 public:
+    // Перегрузка оператора присваивания
+    CustomGrid& operator=(const CustomGrid& other) {
+        if (this != &other) { // Проверка на самоприсваивание
+            Grid::operator=(other); // Копируем базовую часть
+            // Здесь можно добавить код для копирования специфичных для CustomGrid данных
+        }
+        return *this;
+    }
+
     // Перегрузка метода initializeGrid без вызова базового метода
     void initializeGrid() override {
         std::cout << "Инициализация пользовательской сетки." << std::endl;
