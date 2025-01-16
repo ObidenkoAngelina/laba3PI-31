@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+﻿﻿#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
@@ -9,7 +9,7 @@
 #define TIME_LIMIT 300
 
 class Grid {
-private:
+protected:
     char cells[SIZE][SIZE];
     bool visible[SIZE][SIZE];
     static int gridCount;
