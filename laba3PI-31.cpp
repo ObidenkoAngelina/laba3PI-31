@@ -15,7 +15,6 @@ protected:
     static int gridCount;
 
 public:
-
     Grid() {
         // Инициализация массива visible
         for (int row = 0; row < SIZE; row++) {
@@ -86,7 +85,7 @@ public:
 
     void hideNumbers(int row) {
         int hiddenCount = 0;
-        while (hiddenCount < 1) { // Скрываем 4 числа
+        while (hiddenCount < 4) { // Скрываем 4 числа
             int col = rand() % SIZE; // Генерируем случайный индекс колонки
             if (this->visible[row][col]) { // Проверяем, чтобы не скрыть уже скрытое
                 this->visible[row][col] = false; // Скрыть это число
@@ -97,70 +96,66 @@ public:
 
     bool insertNumber(int row, int col, int number) {
         // Проверка корректности введенных индексов
-        if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
+        if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) { // Исправлено: добавлены логические операторы
             throw std::out_of_range("Некорректный выбор ячейки."); // Выбрасываем исключение
         }
 
         // Проверка, открыта ли ячейка
-        if (visible[row][col]) {
+        if (!visible[row][col]) { // Исправлено: логика проверки
             throw std::logic_error("Эта ячейка уже открыта."); // Выбрасываем исключение
         }
 
         // Проверка на корректность введенного числа
-        if (number < 1 || number > 9) {
+        if (number < 1 || number > 9) { // Исправлено: добавлены логические операторы
             throw std::invalid_argument("Неверное число. Пожалуйста, введите число от 1 до 9."); // Выбрасываем исключение
         }
 
-        // Сравнение введенного числа с фактическим значением ячейки
-        if (cells[row][col] == '0' + number) {
-            visible[row][col] = true; // Открываем ячейку
-            std::cout << "Правильное число! Ячейка открыта.\n";
-            return true;
-        }
-        else {
-            std::cout << "Неправильное число!\n";
-            return false;
-        }
+        // Вставка числа в ячейку
+        this->cells[row][col] = '0' + number; // Преобразуем в символ
+        return true; // Успешная вставка
     }
 
-    void insertNumber(int row, int col, int number, bool* result) {
-        *result = insertNumber(row, col, number);
-    }
+    // Метод для сортировки значений в сетке
+    void sortGrid() {
+        int values[SIZE * SIZE];
+        int index = 0;
 
-    bool allCellsVisible() {
+        // Сохраняем значения в одномерный массив
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
-                if (!this->visible[row][col]) {
-                    return false; // Если найдена закрытая ячейка
+                values[index++] = cells[row][col] - '0'; // Преобразуем символ в число
+            }
+        }
+
+        // Сортировка пузырьком
+        for (int i = 0; i < SIZE * SIZE - 1; i++) {
+            for (int j = 0; j < SIZE * SIZE - i - 1; j++) {
+                if (values[j] > values[j + 1]) {
+                    std::swap(values[j], values[j + 1]);
                 }
             }
         }
-        return true; // Все ячейки открыты
-    }
 
-    static bool isTimeUp(time_t startTime) {
-        return difftime(time(NULL), startTime) >= TIME_LIMIT; // Возвращает true, если время истекло
-    }
-
-    // Перегрузка оператора вывода
-    friend std::ostream& operator<<(std::ostream& os, const Grid& grid) {
-        os << "+---+---+---+---+---+---+---+---+---+\n";
+        // Заполняем сетку отсортированными значениями
+        index = 0;
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
-                if (grid.visible[row][col]) {
-                    os << "| " << grid.cells[row][col] << " "; // Печать видимых значений
-                }
-                else {
-                    os << "|   "; // Печать скрытых значений
-                }
+                cells[row][col] = '0' + values[index++]; // Преобразуем обратно в символ
             }
-            os << "|\n";
-            os << "+---+---+---+---+---+---+---+---+---+\n";
         }
-        return os;
     }
 
+    // Метод для отображения сетки
+    void displayGrid() {
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                std::cout << cells[row][col] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
 };
+
 
 // Инициализация статического поля
 int Grid::gridCount = 0;
