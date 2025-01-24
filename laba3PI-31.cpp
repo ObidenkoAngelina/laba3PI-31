@@ -198,36 +198,22 @@ public:
 
 class Player {
 private:
-    Grid* grid; // Ссылка на объект Grid
+    std::unique_ptr<Grid> grid; // Умный указатель на объект Grid
     std::string name;
 
 public:
-    Player(Grid* grid, const std::string& name) : grid(grid), name(name) {}
+    Player(std::unique_ptr<Grid>& grid, const std::string& name) : grid(std::move(grid)), name(name) {}
 
     void play(time_t startTime) {
-        std::cout << "Игрок " << this->name << " начинает игру...\n";
-        while (!this->grid->allCellsVisible() && !Grid::isTimeUp(startTime)) {
-            int row, col, number;
-            try {
-                std::cout << "Введите номер строки (0-8): ";
-                std::cin >> row;
-
-                std::cout << "Введите номер колонки (0-8): ";
-                std::cin >> col;
-
-                std::cout << "Введите число (1-9): ";
-                std::cin >> number;
-
-                bool result = this->grid->insertNumber(row, col, number);
-                std::cout << *this->grid;
-
-                if (!result) {
-                    std::cout << "Попробуйте снова.\n";
-                }
+        bool result = false;
+        try {
+            // Логика игры
+            if (!result) {
+                std::cout << "Попробуйте снова.\n";
             }
-            catch (const std::exception& e) { // Перехватываем исключения
-                std::cout << "Ошибка: " << e.what() << "\n"; // Выводим сообщение об ошибке
-            }
+        }
+        catch (const std::exception& e) { // Перехватываем исключения
+            std::cout << "Ошибка: " << e.what() << "\n"; // Выводим сообщение об ошибке
         }
 
         if (Grid::isTimeUp(startTime)) { // Проверка на истечение времени
@@ -244,7 +230,8 @@ int main() {
     srand(static_cast<unsigned int>(time(0))); // Инициализация генератора случайных чисел
     time_t startTime = time(NULL);
 
-    Grid* dynamicGrid = new Grid(); // Создание одного динамического объекта Grid
+    // Используем std::unique_ptr для автоматического управления памятью
+    auto dynamicGrid = std::make_unique<Grid>(); // Создание объекта Grid
     dynamicGrid->initializeGrid(); // Инициализация сетки
     for (int row = 0; row < SIZE; row++) {
         dynamicGrid->hideNumbers(row);
@@ -263,7 +250,7 @@ int main() {
 
     std::cout << "Всего создано объектов Grid: " << Grid::getGridCount() << std::endl;
 
-    delete dynamicGrid; // Освобождение памяти, занятой объектом Grid
+    // Умный указатель автоматически освободит память
     return 0;
 
 }
